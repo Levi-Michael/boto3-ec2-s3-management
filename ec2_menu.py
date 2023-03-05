@@ -1,4 +1,4 @@
-import boto3, logging, os
+import boto3, logging
 from botocore.exceptions import ClientError
 
 menu_options = {
@@ -9,6 +9,9 @@ menu_options = {
     5: 'Trun off EC2',
     6: 'Exit',
 }
+
+ec2 = boto3.resource('ec2')
+
 
 def print_menu():
     for key in menu_options.keys():
@@ -23,11 +26,9 @@ def create_ec2():
         instances_owner = input("Please enter instances owner name: ")
         instances_imageid = input("Please enter imageID(e.g.: ami-06c39ed6b42908a36): ")
         instances_mincount = int(input("Please enter numer for minimum count: "))
-        instances_maxcount = int(input("Please enter numer for minimum count: "))
+        instances_maxcount = int(input("Please enter numer for maxnimum count: "))
         instances_instancetype = input("Please enter a instance type(e.g.: t2.micro): ")
         instances_subnetid = input("Please enter a subnetid(e.g.: subnet-02406b0473c39ec2b): ")
-
-        ec2 = boto3.resource('ec2')
 
         instances = ec2.create_instances(
                 ImageId=instances_imageid,
@@ -60,8 +61,6 @@ def delete_ec2():
     print('Handle option \'delete_ec2\'')
 
     try: 
-        ec2 = boto3.resource('ec2')
-
         list_id = 0
 
         print('Existing instances: ')
@@ -83,7 +82,6 @@ def delete_ec2():
 def ec2_information():
     print('Handle option \'ec2_information\'')
     try: 
-        ec2 = boto3.resource('ec2')
 
         print('Existing instances: ')
         for i in ec2.instances.all():
@@ -137,7 +135,7 @@ def stop_ec2():
         list_id = 0
 
         print('Existing instances: ')
-        for i in ec2_list.instances.all():
+        for i in ec2.instances.all():
             list_id += 1
             print(f"{list_id}: {i.id}")
         
