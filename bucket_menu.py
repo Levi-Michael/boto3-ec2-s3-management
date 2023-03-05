@@ -1,4 +1,4 @@
-import boto3, logging, os
+import boto3, logging
 from botocore.exceptions import ClientError
 
 menu_options = {
@@ -10,6 +10,8 @@ menu_options = {
     6: 'Exit',
 }
 
+s3 = boto3.resource('s3')
+s3_client = boto3.client('s3')
 
 def print_menu():
     for key in menu_options.keys():
@@ -20,7 +22,6 @@ def print_bucket_list():
     print('Handle option \'print_bucket_list\'')
 
     try:
-        s3 = boto3.resource('s3')
         bucket_number = 0
 
         print('Existing buckets: ')
@@ -41,7 +42,6 @@ def create_bucket():
 
     try:
         if bucket_region is None:
-            s3_client = boto3.client('s3')
             s3_client.create_bucket(Bucket=bucket_name)
         else:
             s3_client = boto3.client('s3', region_name=bucket_region)
@@ -58,10 +58,8 @@ def delete_bucket():
 
     print_bucket_list()
     try:
-        client = boto3.client('s3')
-
         bucket_for_delete = input('Please enter bucket name for delete: ')
-        response = client.delete_bucket(Bucket=bucket_for_delete)
+        response = s3_client.delete_bucket(Bucket=bucket_for_delete)
     except ClientError as e:
         logging.error(e)
         return False
@@ -72,7 +70,6 @@ def delete_file():
         print('Handle option \'delete_file\'')
         
         bucket_name = input('Please enter bucket name: ')
-        s3 = boto3.resource('s3')
 
         my_bucket = s3.Bucket(bucket_name)
         file_number= 0
@@ -97,7 +94,7 @@ def add_file():
     file_name = input('Please enter file name with path: ')
     object_name = input('Please enter AWS file display name: ')
 
-    s3_client = boto3.client('s3')
+
     try:
         response = s3_client.upload_file(file_name, bucket_name, object_name)
     except ClientError as e:
